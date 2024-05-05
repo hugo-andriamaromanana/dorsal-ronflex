@@ -2,9 +2,7 @@
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, List
-from numpy import float64, floating
-from numpy.typing import NDArray
+from typing import List
 
 
 @dataclass
@@ -16,6 +14,7 @@ class Signals:
 
     times: List[float] = field(default_factory=list)
     amps: List[float] = field(default_factory=list)
+
 
 @dataclass(frozen=True)
 class Spike:
