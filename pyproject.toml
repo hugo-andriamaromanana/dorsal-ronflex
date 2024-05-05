@@ -1,0 +1,61 @@
+[tool.poetry]
+name = "dorsal-ronflex"
+version = "0.1.0"
+description = ""
+authors = ["hugo-andriamaromanana <hugo.andriamaromanana@laplateforme.io>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+icecream = "^2.1.3"
+pyabf = "^2.3.8"
+loguru = "^0.7.2"
+ipykernel = "^6.29.4"
+pydantic = "^2.7.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+icecream = "*"
+ipykernel = "^6.29.4"
+
+[tool.poetry.group.ci.dependencies]
+black = { version = "*", allow-prereleases = true }
+isort = "*"
+ruff = "*"
+mypy = "*"
+# Stubs
+types-toml = "*"
+pandas-stubs = "*"
+types-pyyaml = "*"
+
+[tool.isort]
+profile = "black"
+
+[tool.ruff]
+exclude = ["docs", "archive"]
+lint.select = ["E", "F", "W", "C90", "I", "D", "UP", "PD", "PL"]
+lint.ignore = ["D104", "D107", "D205", "D415"]
+lint.pydocstyle.convention = "google"
+lint.pylint.max-args = 8
+lint.mccabe.max-complexity = 5
+
+[tool.mypy]
+files = ["dorsal_ronflex"]
+strict = true
+namespace_packages = true
+explicit_package_bases = true
+disallow_untyped_calls = false
+
+
+[[tool.mypy.overrides]]
+module = [
+    "smart_open.*",
+    "icecream.*",
+]
+ignore_missing_imports = true
