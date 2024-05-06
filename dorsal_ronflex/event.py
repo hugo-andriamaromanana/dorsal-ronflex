@@ -2,7 +2,12 @@
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List
+from os import mkdir
+from os.path import join
+from pathlib import Path
+from typing import Dict, List
+
+import pandas as pd
 
 
 @dataclass
@@ -38,12 +43,52 @@ class Event:
     rect_area: float
     """
 
-    stim_time: int
-    start_time: int
-    end_time: int
+    sweep_id: int
+    stim_time: float
+    start_time: float
+    end_time: float
     raw_peaks: List[Spike]
     rect_peaks: List[Spike]
     rect_area: float
+    control_rect_area: float
+
+    def to_csv(self, output_path: str | Path) -> None:
+        """Writes data to CSV files."""
+        # Write resume data to CSV
+        resume_data = pd.DataFrame(
+            {
+                "stim_time": [self.stim_time],
+                "start_time": [self.start_time],
+                "end_time": [self.end_time],
+                "rect_area": [self.rect_area],
+                "control_rect_area": [self.control_rect_area],
+            }
+        )
+        mkdir(join(output_path, str(self.sweep_id)))
+        new_path = join(output_path, str(self.sweep_id))
+        resume_data.to_csv(join(new_path, "resume.csv"), index=False)
+
+        # Write raw peaks to JSON
+        raw_peaks_data = pd.DataFrame(self.raw_peaks_as_dict, index=[0])
+        raw_peaks_data.to_json(
+            join(new_path, "raw_peaks.json"), orient="records", indent=4
+        )
+
+        # Write rect peaks to JSON
+        rect_peaks_data = pd.DataFrame(self.rect_spikes_as_dict, index=[0])
+        rect_peaks_data.to_json(
+            join(new_path, "rect_peaks.json"), orient="records", indent=4
+        )
+
+    @property
+    def raw_peaks_as_dict(self) -> Dict[float, float]:
+        """Returns a dictionary of spikes."""
+        return {spike.time: spike.amp for spike in self.raw_peaks}
+
+    @property
+    def rect_spikes_as_dict(self) -> Dict[float, float]:
+        """Returns a dictionary of spikes."""
+        return {spike.time: spike.amp for spike in self.rect_peaks}
 
 
 @dataclass
