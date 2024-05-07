@@ -4,16 +4,19 @@ from dataclasses import dataclass
 from typing import List
 
 
-@dataclass(frozen = True)
+@dataclass(frozen=True)
 class Spike:
     """Definition of a spike"""
+
     amp: float
     time: float
 
-@dataclass(frozen = True)
+
+@dataclass(frozen=True)
 class Spikes:
     """Contains the stimulation spike
     and the rest of the spikes
     """
-    stim : Spike
+
+    stim: Spike
     res: List[Spike]

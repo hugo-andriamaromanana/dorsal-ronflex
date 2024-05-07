@@ -13,6 +13,7 @@ from dorsal_ronflex.sweep.event_bondaries import infer_event_bondaries
 @dataclass
 class Sweep:
     """Everything we need from a Sweep"""
+
     id: int
     raw_signals: Signal
     abs_signals: Signal
@@ -35,7 +36,7 @@ class Sweep:
         return self.abs_signals.spikes
 
     @cached_property
-    def event_bondaries(self) -> Tuple[float,float]:
+    def event_bondaries(self) -> Tuple[float, float]:
         """Start time and end time of the event"""
         return infer_event_bondaries(self)
 

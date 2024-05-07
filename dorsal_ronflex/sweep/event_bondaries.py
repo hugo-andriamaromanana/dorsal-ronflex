@@ -47,4 +47,3 @@ def infer_event_bondaries(sweep: Sweep) -> Tuple[float, float]:
     return _match_time_to_signals(
         sweep.abs_signals.times, decremented_time
     ), _match_time_to_signals(sweep.abs_signals.times, incremented_time)
-

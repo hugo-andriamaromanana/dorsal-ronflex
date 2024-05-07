@@ -43,6 +43,6 @@ def create_abs_signal(
     spike_tolerence: float,
 ) -> Signal:
     """Applies absolute value to all amps"""
-    signal = create_signal(times,amps,interval,spike_tolerence)
+    signal = create_signal(times, amps, interval, spike_tolerence)
     new_amps = [abs(amp) for amp in signal.amps]
     return Signal(signal.spike_tolerence, new_amps, signal.times)

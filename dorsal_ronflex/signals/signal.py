@@ -7,9 +7,10 @@ from dorsal_ronflex.spikes.create_spikes import create_spikes
 from dorsal_ronflex.spikes.spike import Spikes
 
 
-@dataclass(frozen = True)
+@dataclass(frozen=True)
 class Signal:
     """Abstract Base Class for vague definitions of signals"""
+
     spike_tolerence: float
     amps: List[float]
     times: List[float]
@@ -17,4 +18,4 @@ class Signal:
     @property
     def spikes(self) -> Spikes:
         """Creating spike object from signals"""
-        return create_spikes(self,self.spike_tolerence)
+        return create_spikes(self, self.spike_tolerence)
