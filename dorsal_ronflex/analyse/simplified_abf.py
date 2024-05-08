@@ -12,7 +12,6 @@ from genericpath import exists
 from loguru import logger
 from pandas import DataFrame, concat
 from pyabf import ABF
-from tqdm import tqdm
 
 from dorsal_ronflex.settings import CONFIG, DEFAULT_CHANNEL_STR, ConfigLoader
 from dorsal_ronflex.sweep.create_sweep import create_sweep
@@ -92,7 +91,7 @@ class AbfStudy:
         """Data of the sweeps."""
         sweep_data = []
         logger.info(f"Creating sweep data for {self.name}")
-        for sweep_number in tqdm(range(self.sweep_count)):
+        for sweep_number in range(self.sweep_count):
             self.abf.setSweep(sweep_number, channel=_DEFAULT_CHANNEL)
             sweep = create_sweep(sweep_number, self.abf.sweepX, self.abf.sweepY)
             sweep_data.append(sweep)

@@ -1,8 +1,10 @@
 """Analysis module."""
 
 from pathlib import Path
+from sys import exit
 
 from loguru import logger
+from tqdm import tqdm
 
 from dorsal_ronflex.analyse.simplified_abf import AbfStudy
 
@@ -21,8 +23,12 @@ def analyse_and_save_study(
     study_path: str | Path, output: Path, config_path: str | Path
 ) -> None:
     """Analyse and save the study."""
-    study = AbfStudy(study_path, config_path)
-    study.save(output)
+    try:
+        study = AbfStudy(study_path, config_path)
+        study.save(output)
+    except Exception as e:
+        logger.critical(f"Error analysing {study_path}: {e}")
+        exit(0)
 
 
 def analyse_and_save(path: str, output: Path, config: str | Path) -> None:
@@ -32,7 +38,7 @@ def analyse_and_save(path: str, output: Path, config: str | Path) -> None:
     if is_file(path):
         analyse_and_save_study(path, output, config)
     elif is_directory(path):
-        for file in Path(path).rglob("*.abf"):
+        for file in tqdm(Path(path).rglob("*.abf")):
             analyse_and_save_study(file, output, config)
     else:
         logger.critical(f"Path {path} is not a file nor directory.")
