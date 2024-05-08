@@ -4,10 +4,11 @@ Dorsal Ronflex is a Python package for analyzing ABF files. It provides a set of
 
 ## Installation
 
-To install Dorsal Ronflex, you can use the provided [``install.sh``](install.sh) script:
+To install Dorsal Ronflex, you can use the provided [``install.sh``](install.sh) script, download it on GitHub and you can run it on a ``Linux Machine`` by using:
 
 ```sh
-./install.sh
+chmod +x install.sh
+sh install.sh
 ```
 
 ## Usage
