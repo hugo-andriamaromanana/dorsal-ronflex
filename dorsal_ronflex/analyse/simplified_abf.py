@@ -3,10 +3,14 @@
 from dataclasses import dataclass
 from datetime import datetime
 from functools import cached_property
+from os import mkdir
+from os.path import join
 from pathlib import Path
 from typing import List
 
+from genericpath import exists
 from loguru import logger
+from pandas import DataFrame, concat
 from pyabf import ABF
 from tqdm import tqdm
 
@@ -15,6 +19,18 @@ from dorsal_ronflex.sweep.create_sweep import create_sweep
 from dorsal_ronflex.sweep.sweep import Sweep
 
 _DEFAULT_CHANNEL = CONFIG[DEFAULT_CHANNEL_STR]
+
+
+def generate_unique_dirname(directory: str, dirname: str) -> str:
+    """Generate a unique directory name by appending a number
+    if directory already exists.
+    """
+    counter = 1
+    new_dirname = dirname
+    while exists(join(directory, new_dirname)):
+        new_dirname = f"{dirname}_{counter}"
+        counter += 1
+    return new_dirname
 
 
 def load_abf(abf_file: str | Path) -> ABF:
@@ -69,7 +85,7 @@ class AbfStudy:
     @cached_property
     def adc_units(self) -> str:
         """Units of the ADC channel."""
-        return self.abf.adcUnits[_DEFAULT_CHANNEL]
+        return str(self.abf.adcUnits[_DEFAULT_CHANNEL])
 
     @cached_property
     def sweep_data(self) -> List[Sweep]:
@@ -82,14 +98,59 @@ class AbfStudy:
             sweep_data.append(sweep)
         logger.info(f"Finished {self.sweep_count} sweeps.")
         return sweep_data
-    
+
     def sweep_repr(self) -> str:
         """Representation of the sweep data."""
         return "\n".join(sweep.to_txt() for sweep in self.sweep_data)
 
-    def to_csv(self) -> str:
-        pass
+    def to_txt(self) -> str:
+        """Returns a string representation of the study."""
+        return f"""
+Study: {self.name}
+Protocol: {self.protocol}
+Start time: {self.abd_start_time}
+ADC Name: {self.adc_name}
+ADC Units: {self.adc_units}
+Sweep Count: {self.sweep_count}
+{self.sweep_repr()}
+"""
+
+    def to_df(self) -> DataFrame:
+        """Returns a DataFrame representation of the study."""
+        data = []
+        for i, sweep in enumerate(self.sweep_data):
+            first_part = DataFrame(
+                {
+                    "Study": [self.name],
+                    "Sweep Number": [sweep.id],
+                    "ABD Start Time": [self.abd_start_time],
+                    "Protocol": [self.protocol],
+                    "ADC Name": [self.adc_name],
+                    "ADC Units": [self.adc_units],
+                    "Sweep Count": [self.sweep_count],
+                    "Sweep ID": [i],
+                }
+            )
+            second_part = sweep.to_df()
+            merged_df = concat([first_part, second_part], axis=1)
+            data.append(merged_df)
+        return concat(data, ignore_index=True)
 
     def save(self, destination: str | Path) -> None:
         """Save the study to a file."""
-        raise NotImplementedError("Saving is not implemented yet.")
+        unique_dirname = generate_unique_dirname(str(destination), self.name)
+        output_dir = join(destination, unique_dirname)
+        mkdir(output_dir)
+
+        txt_name = f"{self.name}.txt"
+        csv_name = f"{self.name}.csv"
+        txt_destination = join(output_dir, txt_name)
+        csv_destination = join(output_dir, csv_name)
+
+        with open(txt_destination, "w") as file:
+            file.write(self.to_txt())
+        logger.info(f"Saved {txt_name} to {destination}")
+
+        with open(csv_destination, "w") as file:
+            self.to_df().to_csv(file)
+        logger.info(f"Saved {csv_name} to {destination}")

@@ -11,6 +11,7 @@ class Spike:
     amp: float
     time: float
 
+
 @dataclass(frozen=True)
 class Spikes:
     """Contains the stimulation spike

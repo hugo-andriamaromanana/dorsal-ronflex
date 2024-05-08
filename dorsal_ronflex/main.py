@@ -8,7 +8,6 @@ from dorsal_ronflex.analyse.analysis import analyse_and_save
 
 def main() -> None:
     """Main function for the dorsal_ronflex package."""
-
     parser = ArgumentParser(description="Dorsal Ronflex")
 
     parser.add_argument(
@@ -40,3 +39,7 @@ def main() -> None:
     config = args.config
 
     analyse_and_save(path, output, config)
+
+
+if __name__ == "__main__":
+    main()
