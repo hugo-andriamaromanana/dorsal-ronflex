@@ -82,6 +82,13 @@ class AbfStudy:
             sweep_data.append(sweep)
         logger.info(f"Finished {self.sweep_count} sweeps.")
         return sweep_data
+    
+    def sweep_repr(self) -> str:
+        """Representation of the sweep data."""
+        return "\n".join(sweep.to_txt() for sweep in self.sweep_data)
+
+    def to_csv(self) -> str:
+        pass
 
     def save(self, destination: str | Path) -> None:
         """Save the study to a file."""

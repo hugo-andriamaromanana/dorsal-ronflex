@@ -1,11 +1,3 @@
-hugo-andriamaromanana: @workspace  generate read me, as you can see in the cli we can enter a config file with a path ect... Make it clear and intermediate level
-
-GitHub Copilot: Deciding which workspace information to collect
-
-Collecting workspace information
-
-Filtering to most relevant information
-
 # Dorsal Ronflex
 
 Dorsal Ronflex is a Python package for analyzing ABF files. It provides a set of tools for loading, analyzing, and saving studies from ABF files.
