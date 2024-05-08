@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from typing import List
 
 
-
 @dataclass(frozen=True)
 class Spike:
     """Definition of a spike"""

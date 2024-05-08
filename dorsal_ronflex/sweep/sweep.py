@@ -1,16 +1,15 @@
 """Handling a complete sweep"""
 
-from icecream import ic
-from loguru import logger
-from numpy import abs, array
 from dataclasses import dataclass
 from functools import cached_property
 from typing import List, Tuple
 
-from numpy import trapz
+from loguru import logger
+from numpy import abs, array, trapz
 
 from dorsal_ronflex.signals.signal import Signal
 from dorsal_ronflex.signals.spike import Spike, Spikes
+
 
 def _get_index_of_time(time: float, times: List[float]) -> int:
     """Gets the index of the time."""
@@ -18,12 +17,10 @@ def _get_index_of_time(time: float, times: List[float]) -> int:
         if signal_time == time:
             return index
     logger.warning("Time not found in signals.")
-    ic(time)
-    ic(max(times))
     raise ValueError("Time not found in signals.")
 
 
-def calc_area_under_curve(sweep: 'Sweep', start_time: float, end_time: float) -> float:
+def calc_area_under_curve(sweep: "Sweep", start_time: float, end_time: float) -> float:
     """Calculates the area under the curve."""
     start_index = _get_index_of_time(start_time, sweep.abs_signals.times)
     stop_index = _get_index_of_time(end_time, sweep.abs_signals.times)
@@ -31,7 +28,6 @@ def calc_area_under_curve(sweep: 'Sweep', start_time: float, end_time: float) ->
     x = sweep.abs_signals.times[start_index:stop_index]
     area = trapz(y, x)
     return float(area)
-
 
 
 def _find_earliest_spike(all_spikes: List[Spike]) -> Spike:
@@ -65,14 +61,20 @@ def _find_bounding_spikes(spikes_res: List[Spike]) -> Tuple[Spike, Spike]:
     return _find_earliest_spike(spikes_res), _find_latest_spike(spikes_res)
 
 
-def infer_event_bondaries(sweep: 'Sweep') -> Tuple[float, float]:
+def infer_event_bondaries(sweep: "Sweep") -> Tuple[float, float]:
     """Applies ms delay to exterme spikes, and fits them on the curve"""
     first_spike, last_spike = _find_bounding_spikes(sweep.abs_spikes.res)
+    logger.warning(f"First spike: {first_spike.time}, Last spike: {last_spike.time}")
     decremented_time = first_spike.time - sweep.ms_delay
     incremented_time = last_spike.time + sweep.ms_delay
-    return _match_time_to_signals(
+    logger.info(
+        f"Decrementing time: {decremented_time}, Incrementing time: {incremented_time}"
+    )
+    start, end = _match_time_to_signals(
         sweep.abs_signals.times, decremented_time
     ), _match_time_to_signals(sweep.abs_signals.times, incremented_time)
+    logger.info(f"Start time: {start}, End time: {end}")
+    return start, end
 
 
 @dataclass
@@ -106,13 +108,22 @@ class Sweep:
         return infer_event_bondaries(self)
 
     @cached_property
+    def event_duration(self) -> float:
+        """Duration of the event"""
+        start, end = self.event_bondaries
+        return end - start
+
+    @cached_property
     def area(self) -> float:
         """Area under the 2 points of event_bondaries"""
         start, end = self.event_bondaries
-        return calc_area_under_curve(self,start,end)
+        return calc_area_under_curve(self, start, end)
 
     @cached_property
     def control_area(self) -> float:
         """Calculates areas on set variables"""
-        start, end = self.event_bondaries[0], self.event_bondaries[0] + self.control_area_increment
-        return calc_area_under_curve(self,start,end)
+        start, end = (
+            self.event_bondaries[0],
+            self.event_bondaries[0] + self.control_area_increment,
+        )
+        return calc_area_under_curve(self, start, end)

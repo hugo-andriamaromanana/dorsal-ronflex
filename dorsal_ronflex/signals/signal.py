@@ -3,19 +3,23 @@
 from dataclasses import dataclass
 from typing import List
 
-from dorsal_ronflex.signals.spike import Spikes, Spike
+import matplotlib.pyplot as plt
+
+from dorsal_ronflex.signals.spike import Spike, Spikes
 
 
-def _find_highest_spike_stim_index(spikes: List[Spike]) -> int:
-    """Finds the largest stimulation time."""
-    max = 0
+def _find_max_amp_index(spikes: list[Spike]) -> int:
+    """Finds the index of the spike with the highest amplitude."""
+    max_amp = 0
+    max_index = 0
     for index, spike in enumerate(spikes):
-        if spike.time > spikes[max].time:
-            max = index
-    return max
+        if spike.amp > max_amp:
+            max_amp = spike.amp
+            max_index = index
+    return max_index
 
 
-def _create_spike_successions(signal: 'Signal', tolerence: float) -> List[List[Spike]]:
+def _create_spike_successions(signal: "Signal", tolerence: float) -> List[List[Spike]]:
     """Finds the spike successions, which is a 2D array containing all spikes found"""
     spikes = []
     successive_spikes = []
@@ -33,7 +37,7 @@ def _create_spike_successions(signal: 'Signal', tolerence: float) -> List[List[S
     return spikes
 
 
-def _create_all_spikes(signals: 'Signal', tolerence: float) -> List[Spike]:
+def _create_all_spikes(signals: "Signal", tolerence: float) -> List[Spike]:
     """Finds the spikes from the successions by taking the highest spikes
     in all the sucessions
     """
@@ -45,10 +49,10 @@ def _create_all_spikes(signals: 'Signal', tolerence: float) -> List[Spike]:
     return spikes
 
 
-def _create_spikes(signals: 'Signal', tolerence: float) -> Spikes:
+def _create_spikes(signals: "Signal", tolerence: float) -> Spikes:
     """Spikes creation, gets all the spikes then splits the stimulation"""
     all_spikes = _create_all_spikes(signals, tolerence)
-    stim_index = _find_highest_spike_stim_index(all_spikes)
+    stim_index = _find_max_amp_index(all_spikes)
     stim = all_spikes.pop(stim_index)
     return Spikes(stim, all_spikes)
 
@@ -65,3 +69,13 @@ class Signal:
     def spikes(self) -> Spikes:
         """Creating spike object from signals"""
         return _create_spikes(self, self.spike_tolerence)
+
+    def plot(self, spikes: List[Spike]) -> None:
+        """Initializes the plot."""
+        plt.plot(self.times, self.amps, lw=2, alpha=0.7, color="b")
+        plt.xlabel("Time (ms)")
+        plt.ylabel("Amps IN 2 (V)")
+        plt.title("Shade a Specific Epoch")
+        for spike in spikes:
+            plt.plot(spike.time, spike.amp, "ro")
+        plt.show()
