@@ -4,7 +4,7 @@ from pathlib import Path
 
 from loguru import logger
 
-from dorsal_ronflex.analysis.simplified_abf import AbfStudy
+from dorsal_ronflex.analyse.simplified_abf import AbfStudy
 
 
 def is_directory(path: str) -> bool:

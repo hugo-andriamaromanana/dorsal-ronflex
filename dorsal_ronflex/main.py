@@ -3,18 +3,21 @@
 from argparse import ArgumentParser
 from pathlib import Path
 
-from dorsal_ronflex.analysis.analysis import analyse_and_save
+from dorsal_ronflex.analyse.analysis import analyse_and_save
 
 
 def main() -> None:
     """Main function for the dorsal_ronflex package."""
+
     parser = ArgumentParser(description="Dorsal Ronflex")
+
     parser.add_argument(
         "path",
         type=Path,
         help="Path to the ABF file or directory containing ABF files.",
         required=True,
     )
+
     parser.add_argument(
         "-o",
         "--output",
@@ -22,6 +25,7 @@ def main() -> None:
         type=Path,
         help="Path to the output directory.",
     )
+
     parser.add_argument(
         "-c",
         "--config",

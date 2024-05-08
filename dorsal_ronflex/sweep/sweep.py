@@ -127,3 +127,24 @@ class Sweep:
             self.event_bondaries[0] + self.control_area_increment,
         )
         return calc_area_under_curve(self, start, end)
+
+    def to_txt(self) -> str:
+        """Returns a string representation of the sweep."""
+        raw_spikes = "".join([str(spike) + "\n" for spike in self.raw_spikes.res])
+        abs_spikes = "".join([str(spike) + "\n" for spike in self.abs_spikes.res])
+        return f"""
+Sweep ID: {self.id}
+Stim: {self.stim}
+Start Time: {self.event_bondaries[0]}
+End Time: {self.event_bondaries[1]}
+Event Duration: {self.event_duration}
+Area: {self.area}
+Control Area: {self.control_area}
+Ms Delay: {self.ms_delay}
+Control Area Increment: {self.control_area_increment}
+
+Raw Spikes:
+{raw_spikes}
+Abs Spikes:
+{abs_spikes}
+"""

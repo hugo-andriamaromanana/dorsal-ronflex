@@ -71,7 +71,7 @@ class Signal:
         return _create_spikes(self, self.spike_tolerence)
 
     def plot(self, spikes: List[Spike]) -> None:
-        """Initializes the plot."""
+        """Initializes the plot with the signal and spikes"""
         plt.plot(self.times, self.amps, lw=2, alpha=0.7, color="b")
         plt.xlabel("Time (ms)")
         plt.ylabel("Amps IN 2 (V)")
