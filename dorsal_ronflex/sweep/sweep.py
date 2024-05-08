@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import List, Tuple
 
-from loguru import logger
 from numpy import abs, array, trapz
 from pandas import DataFrame
 
@@ -14,10 +13,10 @@ from dorsal_ronflex.signals.spike import Spike, Spikes
 
 def _get_index_of_time(time: float, times: List[float]) -> int:
     """Gets the index of the time."""
+    closest_time = _match_time_to_signals(times, time)
     for index, signal_time in enumerate(times):
-        if signal_time == time:
+        if signal_time == closest_time:
             return index
-    logger.warning("Time not found in signals.")
     raise ValueError("Time not found in signals.")
 
 
@@ -65,16 +64,11 @@ def _find_bounding_spikes(spikes_res: List[Spike]) -> Tuple[Spike, Spike]:
 def infer_event_bondaries(sweep: "Sweep") -> Tuple[float, float]:
     """Applies ms delay to exterme spikes, and fits them on the curve"""
     first_spike, last_spike = _find_bounding_spikes(sweep.abs_spikes.res)
-    logger.warning(f"First spike: {first_spike.time}, Last spike: {last_spike.time}")
     decremented_time = first_spike.time - sweep.ms_delay
     incremented_time = last_spike.time + sweep.ms_delay
-    logger.info(
-        f"Decrementing time: {decremented_time}, Incrementing time: {incremented_time}"
-    )
     start, end = _match_time_to_signals(
         sweep.abs_signals.times, decremented_time
     ), _match_time_to_signals(sweep.abs_signals.times, incremented_time)
-    logger.info(f"Start time: {start}, End time: {end}")
     return start, end
 
 
@@ -152,6 +146,8 @@ class Sweep:
 ----------------------------------------
 Sweep ID: {self.id}
 Stim: {self.stim}
+Raw Tolerence: {self.raw_signals.spike_tolerence}
+Abs Tolerance: {self.abs_signals.spike_tolerence}
 Start Time: {self.event_bondaries[0]}
 End Time: {self.event_bondaries[1]}
 Event Duration: {self.event_duration}

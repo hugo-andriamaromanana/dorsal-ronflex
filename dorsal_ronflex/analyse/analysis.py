@@ -23,7 +23,6 @@ def analyse_and_save_study(
     """Analyse and save the study."""
     study = AbfStudy(study_path, config_path)
     study.save(output)
-    logger.info(f"Study saved to {output}.")
 
 
 def analyse_and_save(path: str, output: Path, config: str | Path) -> None:

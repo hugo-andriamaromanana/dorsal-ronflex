@@ -14,7 +14,6 @@ def main() -> None:
         "path",
         type=Path,
         help="Path to the ABF file or directory containing ABF files.",
-        required=True,
     )
 
     parser.add_argument(

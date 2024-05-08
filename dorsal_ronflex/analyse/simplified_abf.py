@@ -149,8 +149,8 @@ Sweep Count: {self.sweep_count}
 
         with open(txt_destination, "w") as file:
             file.write(self.to_txt())
-        logger.info(f"Saved {txt_name} to {destination}")
 
         with open(csv_destination, "w") as file:
             self.to_df().to_csv(file)
-        logger.info(f"Saved {csv_name} to {destination}")
+
+        logger.info(f"Study {self.name} saved to {output_dir}")
