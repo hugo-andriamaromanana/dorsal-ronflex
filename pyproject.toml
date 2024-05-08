@@ -9,7 +9,7 @@ packages = [
 ]
 
 [tool.poetry.scripts]
-dorsal-ronflex = "dorsal_ronflex:main"
+dorsal-ronflex = "dorsal_ronflex.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"

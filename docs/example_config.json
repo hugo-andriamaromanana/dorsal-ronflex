@@ -1,0 +1,9 @@
+{
+    "segment_start": 5568,
+    "segment_end": 5668,
+    "default_curve_check": 90,
+    "default_ms_delay": 5,
+    "default_tolerance": 0.1,
+    "default_abs_tolerance": 0.14,
+    "default_channel": 1
+}
