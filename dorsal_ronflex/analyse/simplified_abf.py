@@ -139,17 +139,24 @@ Sweep Count: {self.sweep_count}
         """Save the study to a file."""
         unique_dirname = generate_unique_dirname(str(destination), self.name)
         output_dir = join(destination, unique_dirname)
-        mkdir(output_dir)
 
         txt_name = f"{self.name}.txt"
         csv_name = f"{self.name}.csv"
         txt_destination = join(output_dir, txt_name)
         csv_destination = join(output_dir, csv_name)
 
+        try:
+            txt_export = self.to_txt()
+            csv_export = self.to_df()
+        except Exception as e:
+            logger.error(f"Error exporting study {self.name}: {e}")
+            raise e
+
+        mkdir(output_dir)
         with open(txt_destination, "w") as file:
-            file.write(self.to_txt())
+            file.write(txt_export)
 
         with open(csv_destination, "w") as file:
-            self.to_df().to_csv(file)
+            csv_export.to_csv(file)
 
         logger.info(f"Study {self.name} saved to {output_dir}")
